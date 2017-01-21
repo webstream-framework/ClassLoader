@@ -1,11 +1,6 @@
 <?php
 namespace WebStream\Module;
 
-require_once dirname(__FILE__) . '/Utility/FileUtils.php';
-require_once dirname(__FILE__) . '/../DI/Injector.php';
-
-use WebStream\Module\Utility\ApplicationUtils;
-use WebStream\Module\Utility\FileUtils;
 use WebStream\DI\Injector;
 
 /**
@@ -16,7 +11,7 @@ use WebStream\DI\Injector;
  */
 class ClassLoader
 {
-    use Injector, FileUtils;
+    use Injector;
 
     /**
      * @var string アプリケーションルートパス
@@ -24,16 +19,17 @@ class ClassLoader
     private $applicationRoot;
 
     /**
-     * コンストラクタ
+     * constructor
+     * @param string アプリケーションルートパス
      */
-    public function __construct()
+    public function __construct($applicationRoot)
     {
-        $this->applicationRoot = $this->getApplicationRoot();
+        $this->applicationRoot = $$applicationRoot;
     }
 
     /**
      * クラスをロードする
-     * @param string|array クラス名
+     * @param mixed クラス名
      * @return array<string> ロード済みクラスリスト
      */
     public function load($className)
