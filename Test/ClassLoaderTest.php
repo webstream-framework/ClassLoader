@@ -2,7 +2,12 @@
 namespace WebStream\ClassLoader\Test;
 
 require_once dirname(__FILE__) . '/../Modules/DI/Injector.php';
+require_once dirname(__FILE__) . '/../Modules/IO/File.php';
 require_once dirname(__FILE__) . '/../ClassLoader.php';
+require_once dirname(__FILE__) . '/../Test/Providers/ClassLoaderProvider.php';
+
+use WebStream\ClassLoader\ClassLoader;
+use WebStream\ClassLoader\Test\Providers\ClassLoaderProvider;
 
 /**
 * ClassLoaderTest
@@ -12,12 +17,38 @@ require_once dirname(__FILE__) . '/../ClassLoader.php';
  */
 class ClassLoaderTest extends \PHPUnit_Framework_TestCase
 {
+    use ClassLoaderProvider;
+
     /**
      * 正常系
      * @test
+     * @dataProvider loadProvider
      */
-    public function okTest()
+    public function okLoadTest($rootDir, $className)
     {
-        // $this->assertNotNull($exception->getExceptionAsString());
+        $classLoader = new ClassLoader($rootDir);
+        $this->assertCount(1, $classLoader->load($className));
+    }
+
+    /**
+     * 正常系
+     * @test
+     * @dataProvider loadSubDirProvider
+     */
+    public function okLoadSubDirTest($rootDir, $className, $subDirList)
+    {
+        $classLoader = new ClassLoader($rootDir);
+        $this->assertCount(1, $classLoader->load($className, $subDirList));
+    }
+
+    /**
+     * 異常系
+     * @test
+     * @dataProvider unLoadProvider
+     */
+    public function ngLoadTest($rootDir, $className)
+    {
+        $classLoader = new ClassLoader($rootDir);
+        $this->assertCount(0, $classLoader->load($className));
     }
 }

@@ -167,13 +167,14 @@ class ClassLoader
     /**
      * ロード可能なクラスを複数返却する
      * @param array クラス名
+     * @param array<string> 検索起点パスリスト
      * @return array<string> ロード済みクラスリスト
      */
-    private function loadClassList(array $classList): array
+    private function loadClassList(array $classList, array $pathList): array
     {
         $includedlist = [];
         foreach ($classList as $className) {
-            $result = $this->loadClass($className);
+            $result = $this->loadClass($className, $pathList);
             if (is_array($result)) {
                 $includedlist = array_merge($includedlist, $result);
             }
