@@ -26,6 +26,27 @@ trait ClassLoaderProvider
         ];
     }
 
+    public function importProvider()
+    {
+        return [
+            [dirname(__FILE__) . '/../Fixtures', 'ImportFixture1.php']
+        ];
+    }
+
+    public function importAllProvider()
+    {
+        return [
+            [dirname(__FILE__) . '/../Fixtures', 'ImportSub']
+        ];
+    }
+
+    public function filteredImportProvider()
+    {
+        return [
+            [dirname(__FILE__) . '/../Fixtures', 'ImportFixture1.php', dirname(__FILE__) . '/../Fixtures/ImportFixture1.php']
+        ];
+    }
+
     public function unLoadProvider()
     {
         return [

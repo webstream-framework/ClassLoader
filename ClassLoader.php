@@ -25,13 +25,20 @@ class ClassLoader
     private $applicationRoot;
 
     /**
+     * @var array<string> サブディレクトリパスリスト
+     */
+    private $subDirectoryPathList;
+
+    /**
      * constructor
      * @param string アプリケーションルートパス
+     * @param array<string> サブディレクトリパスリスト
      */
-    public function __construct(string $applicationRoot)
+    public function __construct(string $applicationRoot, $subDirectoryPathList = [])
     {
         $this->logger = new class() { function __call($name, $args) {} };
         $this->applicationRoot = $applicationRoot;
+        $this->subDirectoryPathList = $subDirectoryPathList;
     }
 
     /**
@@ -39,22 +46,18 @@ class ClassLoader
      * @param mixed クラス名
      * @return array<string> ロード済みクラスリスト
      */
-    public function load(string $className, array $pathList = []): array
+    public function load(string $className): array
     {
-        if (empty($pathList)) {
-            $pathList[] = '/';
-        }
-
-        return is_array($className) ? $this->loadClassList($className, $pathList) : $this->loadClass($className, $pathList);
+        return is_array($className) ? $this->loadClassList($className) : $this->loadClass($className);
     }
 
     /**
      * ファイルをインポートする
      * @param string ファイルパス
      * @param callable フィルタリング無名関数 trueを返すとインポート
-     * @return boolean インポート結果
+     * @return bool インポート結果
      */
-    public function import($filepath, callable $filter = null): boolean
+    public function import($filepath, callable $filter = null): bool
     {
         $file = new File($this->applicationRoot . "/" . $filepath);
         if ($file->isFile()) {
@@ -75,11 +78,10 @@ class ClassLoader
      * 指定ディレクトリのファイルをインポートする
      * @param string ディレクトリパス
      * @param callable フィルタリング無名関数 trueを返すとインポート
-     * @return boolean インポート結果
+     * @return bool インポート結果
      */
-    public function importAll($dirPath, callable $filter = null)
+    public function importAll($dirPath, callable $filter = null): bool
     {
-        // $includeDir = realpath($this->applicationRoot . "/" . $dirPath);
         $dir = new File($this->applicationRoot . "/" . $dirPath);
         if ($dir->isDirectory()) {
             $iterator = $this->getFileSearchIterator($dir->getFilePath());
@@ -88,7 +90,7 @@ class ClassLoader
                 if (preg_match("/(?:\/\.|\/\.\.|\.DS_Store)$/", $filepath)) {
                     continue;
                 }
-                $file = new File($filePath);
+                $file = new File($filepath);
                 if ($file->isFile()) {
                     if ($file->getFileExtension() === 'php') {
                         if ($filter === null || (is_callable($filter) && $filter($file->getFilePath()) === true)) {
@@ -109,10 +111,9 @@ class ClassLoader
     /**
     * ロード可能なクラスを返却する
     * @param string クラス名(フルパス指定の場合はクラスパス)
-    * @param array<string> 検索起点パスリスト
     * @return array<string> ロード可能クラス
      */
-    private function loadClass(string $className, array $pathList): array
+    private function loadClass(string $className): array
     {
         $rootDir = $this->applicationRoot;
         $logger = $this->logger;
@@ -146,15 +147,15 @@ class ClassLoader
             return $includeList;
         };
 
-        $includeList = $search("${rootDir}", "${className}.php");
+        $includeList = $search("${rootDir}", DIRECTORY_SEPARATOR . "${className}.php");
         if (!empty($includeList)) {
             return $includeList;
         }
 
-        foreach ($pathList as $searchPath) {
+        foreach ($this->subDirectoryPathList as $searchPath) {
             if (preg_match("/(?:.*\/){0,}(.+)/", $className, $matches)) {
                 $classNameWithoutNamespace = $matches[1];
-                $includeList = $search("${rootDir}/${searchPath}", "${classNameWithoutNamespace}.php");
+                $includeList = $search("${rootDir}/${searchPath}", DIRECTORY_SEPARATOR . "${classNameWithoutNamespace}.php");
                 if (!empty($includeList)) {
                     return $includeList;
                 }
@@ -167,14 +168,13 @@ class ClassLoader
     /**
      * ロード可能なクラスを複数返却する
      * @param array クラス名
-     * @param array<string> 検索起点パスリスト
      * @return array<string> ロード済みクラスリスト
      */
-    private function loadClassList(array $classList, array $pathList): array
+    private function loadClassList(array $classList): array
     {
         $includedlist = [];
         foreach ($classList as $className) {
-            $result = $this->loadClass($className, $pathList);
+            $result = $this->loadClass($className);
             if (is_array($result)) {
                 $includedlist = array_merge($includedlist, $result);
             }

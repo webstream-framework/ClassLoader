@@ -21,6 +21,7 @@ class ClassLoaderTest extends \PHPUnit_Framework_TestCase
 
     /**
      * 正常系
+     * loadが成功すること
      * @test
      * @dataProvider loadProvider
      */
@@ -32,17 +33,60 @@ class ClassLoaderTest extends \PHPUnit_Framework_TestCase
 
     /**
      * 正常系
+     * サブディレクトリを指定してloadが成功すること
      * @test
      * @dataProvider loadSubDirProvider
      */
     public function okLoadSubDirTest($rootDir, $className, $subDirList)
     {
+        $classLoader = new ClassLoader($rootDir, $subDirList);
+        $this->assertCount(1, $classLoader->load($className));
+    }
+
+    /**
+     * 正常系
+     * importで指定ファイルをインポートできること
+     * @test
+     * @dataProvider importProvider
+     */
+    public function okImportTest($rootDir, $className)
+    {
         $classLoader = new ClassLoader($rootDir);
-        $this->assertCount(1, $classLoader->load($className, $subDirList));
+        $this->assertTrue($classLoader->import($className));
+        $this->assertTrue(class_exists(\WebStream\ClassLoader\Test\Fixtures\ImportFixture1::class));
+    }
+
+    /**
+     * 正常系
+     * importAllで指定ディレクトリ配下のファイルをすべてインポートできること
+     * @test
+     * @dataProvider importAllProvider
+     */
+    public function okImportAllTest($rootDir, $dirName)
+    {
+        $classLoader = new ClassLoader($rootDir);
+        $this->assertTrue($classLoader->importAll($dirName));
+        $this->assertTrue(class_exists(\WebStream\ClassLoader\Test\Fixtures\ImportFixture2::class));
+        $this->assertTrue(class_exists(\WebStream\ClassLoader\Test\Fixtures\ImportFixture3::class));
+    }
+
+    /**
+     * 正常系
+     * importで指定ファイルをインポートできること
+     * @test
+     * @dataProvider filteredImportProvider
+     */
+    public function okFilteredImportTest($rootDir, $className, $ignoreClassName)
+    {
+        $classLoader = new ClassLoader($rootDir);
+        $this->assertTrue($classLoader->import($className, function ($filepath) use ($ignoreClassName) {
+            return $filepath === $ignoreClassName;
+        }));
     }
 
     /**
      * 異常系
+     * loadに失敗した場合、結果が0件になること
      * @test
      * @dataProvider unLoadProvider
      */
