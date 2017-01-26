@@ -5,9 +5,11 @@ require_once dirname(__FILE__) . '/../Modules/DI/Injector.php';
 require_once dirname(__FILE__) . '/../Modules/IO/File.php';
 require_once dirname(__FILE__) . '/../ClassLoader.php';
 require_once dirname(__FILE__) . '/../Test/Providers/ClassLoaderProvider.php';
+require_once dirname(__FILE__) . '/../Test/Fixtures/DummyLogger.php';
 
 use WebStream\ClassLoader\ClassLoader;
 use WebStream\ClassLoader\Test\Providers\ClassLoaderProvider;
+use WebStream\ClassLoader\Test\Fixtures\DummyLogger;
 
 /**
 * ClassLoaderTest
@@ -72,7 +74,7 @@ class ClassLoaderTest extends \PHPUnit_Framework_TestCase
 
     /**
      * 正常系
-     * importで指定ファイルをインポートできること
+     * フィルタ付きimportで指定ファイルをインポートできること
      * @test
      * @dataProvider filteredImportProvider
      */
@@ -82,6 +84,22 @@ class ClassLoaderTest extends \PHPUnit_Framework_TestCase
         $this->assertTrue($classLoader->import($className, function ($filepath) use ($ignoreClassName) {
             return $filepath === $ignoreClassName;
         }));
+        $this->assertTrue(class_exists(\WebStream\ClassLoader\Test\Fixtures\ImportFixture4::class));
+    }
+
+    /**
+     * 正常系
+     * フィルタ付きimportAllで指定ファイルをインポートできること
+     * @test
+     * @dataProvider filteredImportAllProvider
+     */
+    public function okFilteredImportAllTest($rootDir, $dirName, $ignoreClassName)
+    {
+        $classLoader = new ClassLoader($rootDir);
+        $this->assertTrue($classLoader->importAll($dirName, function ($filepath) use ($ignoreClassName) {
+            return $filepath === $ignoreClassName;
+        }));
+        $this->assertTrue(class_exists(\WebStream\ClassLoader\Test\Fixtures\ImportFixture5::class));
     }
 
     /**
@@ -94,5 +112,37 @@ class ClassLoaderTest extends \PHPUnit_Framework_TestCase
     {
         $classLoader = new ClassLoader($rootDir);
         $this->assertCount(0, $classLoader->load($className));
+    }
+
+    /**
+     * 異常系
+     * フィルタにマッチしない場合、importで指定ファイルをインポートできないこと
+     * @test
+     * @dataProvider filteredImportProvider
+     */
+    public function ngFilteredImportTest($rootDir, $className, $ignoreClassName)
+    {
+        $classLoader = new ClassLoader($rootDir);
+        $classLoader->inject('logger', new DummyLogger());
+        $classLoader->import($className, function ($filepath) use ($ignoreClassName) {
+            return false;
+        });
+        $this->expectOutputString('');
+    }
+
+    /**
+     * 異常系
+     * フィルタにマッチしない場合、importAllで指定ファイルをインポートできないこと
+     * @test
+     * @dataProvider filteredImportAllProvider
+     */
+    public function ngFilteredImportAllTest($rootDir, $dirName, $ignoreClassName)
+    {
+        $classLoader = new ClassLoader($rootDir);
+        $classLoader->inject('logger', new DummyLogger());
+        $classLoader->importAll($dirName, function ($filepath) use ($ignoreClassName) {
+            return false;
+        });
+        $this->expectOutputString('');
     }
 }

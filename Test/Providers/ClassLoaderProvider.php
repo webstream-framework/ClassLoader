@@ -43,7 +43,14 @@ trait ClassLoaderProvider
     public function filteredImportProvider()
     {
         return [
-            [dirname(__FILE__) . '/../Fixtures', 'ImportFixture1.php', dirname(__FILE__) . '/../Fixtures/ImportFixture1.php']
+            [dirname(__FILE__) . '/../Fixtures', 'ImportFixture4.php', dirname(__FILE__) . '/../Fixtures/ImportFixture4.php']
+        ];
+    }
+
+    public function filteredImportAllProvider()
+    {
+        return [
+            [dirname(__FILE__) . '/../Fixtures', 'ImportSub', dirname(__FILE__) . '/../Fixtures/ImportSub/ImportFixture5.php']
         ];
     }
 
