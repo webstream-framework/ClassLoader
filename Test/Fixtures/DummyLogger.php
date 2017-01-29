@@ -5,7 +5,6 @@ class DummyLogger
 {
     public function debug($message)
     {
-        var_dump($message);
         echo $message;
     }
 }
