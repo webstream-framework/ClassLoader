@@ -18,6 +18,13 @@ trait ClassLoaderProvider
         ];
     }
 
+    public function loadListProvider()
+    {
+        return [
+            [dirname(__FILE__) . '/../Fixtures', ['Fixture1', 'Fixture2']]
+        ];
+    }
+
     public function loadSubDirProvider()
     {
         return [
@@ -59,6 +66,13 @@ trait ClassLoaderProvider
         return [
             [dirname(__FILE__) . '/../Dummy', 'Fixture1'],
             [dirname(__FILE__) . '/../Fixtures', 'Dummy']
+        ];
+    }
+
+    public function unImportProvider()
+    {
+        return [
+            [dirname(__FILE__) . '/../Fixtures']
         ];
     }
 }

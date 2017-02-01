@@ -43,12 +43,12 @@ class ClassLoader
 
     /**
      * クラスをロードする
-     * @param mixed クラス名
+     * @param mixed クラスまたはクラスリスト
      * @return array<string> ロード済みクラスリスト
      */
-    public function load(string $className): array
+    public function load($target): array
     {
-        return is_array($className) ? $this->loadClassList($className) : $this->loadClass($className);
+        return is_array($target) ? $this->loadClassList($target) : $this->loadClass($target);
     }
 
     /**
