@@ -6,4 +6,4 @@ build:
     - script:
         name: classloader test
         code: |
-          docker -v
+          ls -la ${WERCKER_SOURCE_DIR}
