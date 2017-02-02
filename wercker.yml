@@ -6,4 +6,4 @@ build:
     - script:
         name: classloader test
         code: |
-          ls -la ${WERCKER_SOURCE_DIR}
+          docker run -v ${WERCKER_SOURCE_DIR}:/workspace/ webstream/php-alpine vendor/bin/phpunit --configuration phpunit.xml
