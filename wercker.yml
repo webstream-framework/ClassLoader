@@ -1,0 +1,7 @@
+box: webstream/php-alpine
+build:
+  steps:
+    - script:
+        name: classloader test
+        code: |
+          docker -v
