@@ -36,7 +36,6 @@ class ClassLoaderTest extends \PHPUnit_Framework_TestCase
     /**
      * 正常系
      * loadが成功すること(リスト読み込み)
-     * @test
      * @dataProvider loadListProvider
      */
     public function okLoadListTest($rootDir, $classList)
@@ -136,22 +135,6 @@ class ClassLoaderTest extends \PHPUnit_Framework_TestCase
     {
         $classLoader = new ClassLoader($rootDir);
         $this->assertFalse($classLoader->import("Dummy.php"));
-    }
-
-    /**
-     * 異常系
-     * フィルタにマッチしない場合、importで指定ファイルをインポートできないこと
-     * @test
-     * @dataProvider filteredImportProvider
-     */
-    public function ngFilteredImportTest($rootDir, $className, $ignoreClassName)
-    {
-        $classLoader = new ClassLoader($rootDir);
-        $classLoader->inject('logger', new DummyLogger());
-        $classLoader->import($className, function ($filepath) use ($ignoreClassName) {
-            return false;
-        });
-        $this->expectOutputString('');
     }
 
     /**

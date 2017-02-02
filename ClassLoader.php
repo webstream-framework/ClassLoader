@@ -25,20 +25,13 @@ class ClassLoader
     private $applicationRoot;
 
     /**
-     * @var array<string> サブディレクトリパスリスト
-     */
-    private $subDirectoryPathList;
-
-    /**
      * constructor
      * @param string アプリケーションルートパス
-     * @param array<string> サブディレクトリパスリスト
      */
-    public function __construct(string $applicationRoot, $subDirectoryPathList = [])
+    public function __construct(string $applicationRoot)
     {
         $this->logger = new class() { function __call($name, $args) {} };
         $this->applicationRoot = $applicationRoot;
-        $this->subDirectoryPathList = $subDirectoryPathList;
     }
 
     /**
@@ -83,9 +76,9 @@ class ClassLoader
     public function importAll($dirPath, callable $filter = null): bool
     {
         $dir = new File($this->applicationRoot . "/" . $dirPath);
+        $isSuccess = true;
         if ($dir->isDirectory()) {
             $iterator = $this->getFileSearchIterator($dir->getFilePath());
-            $isSuccess = true;
             foreach ($iterator as $filepath => $fileObject) {
                 if (preg_match("/(?:\/\.|\/\.\.|\.DS_Store)$/", $filepath)) {
                     continue;
@@ -147,22 +140,7 @@ class ClassLoader
             return $includeList;
         };
 
-        $includeList = $search("${rootDir}", DIRECTORY_SEPARATOR . "${className}.php");
-        if (!empty($includeList)) {
-            return $includeList;
-        }
-
-        foreach ($this->subDirectoryPathList as $searchPath) {
-            if (preg_match("/(?:.*\/){0,}(.+)/", $className, $matches)) {
-                $classNameWithoutNamespace = $matches[1];
-                $includeList = $search("${rootDir}/${searchPath}", DIRECTORY_SEPARATOR . "${classNameWithoutNamespace}.php");
-                if (!empty($includeList)) {
-                    return $includeList;
-                }
-            }
-        }
-
-        return $includeList;
+        return $search("${rootDir}", DIRECTORY_SEPARATOR . "${className}.php");
     }
 
     /**
