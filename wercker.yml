@@ -1,5 +1,6 @@
 box:
   id: webstream/php-alpine
+  cmd: /bin/sh
 build:
   steps:
     - script:
