@@ -3,6 +3,7 @@ namespace WebStream\ClassLoader;
 
 use WebStream\DI\Injector;
 use WebStream\IO\File;
+use WebStream\IO\FileInputStream;
 
 /**
  * クラスローダ
@@ -99,6 +100,41 @@ class ClassLoader
         }
 
         return $isSuccess;
+    }
+
+    /**
+     * 名前空間リストを返却する
+     * @param string ファイル名
+     * @return array<string> 名前空間リスト
+     */
+    public function getNamespaces($fileName)
+    {
+        $dir = new File($this->applicationRoot);
+        $namespaces = [];
+        if ($dir->isDirectory()) {
+            $iterator = $this->getFileSearchIterator($dir->getFilePath());
+            foreach ($iterator as $filepath => $fileObject) {
+                if (preg_match("/(?:\/\.|\/\.\.|\.DS_Store)$/", $filepath)) {
+                    continue;
+                }
+                $file = new File($filepath);
+                if ($file->isFile() && $file->getFileName() === $fileName) {
+                    $fis = new FileInputStream($file);
+                    while (($line = $fis->readLine()) !== null) {
+                        if (preg_match("/^namespace\s(.*);$/", $line, $matches)) {
+                            $namespace = $matches[1];
+                            if (substr($namespace, 0) !== '\\') {
+                                $namespace = '\\' . $namespace;
+                            }
+                            $namespaces[] = $namespace;
+                        }
+                    }
+                    $fis->close();
+                }
+            }
+        }
+
+        return $namespaces;
     }
 
     /**

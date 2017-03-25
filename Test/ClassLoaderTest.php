@@ -3,6 +3,8 @@ namespace WebStream\ClassLoader\Test;
 
 require_once dirname(__FILE__) . '/../Modules/DI/Injector.php';
 require_once dirname(__FILE__) . '/../Modules/IO/File.php';
+require_once dirname(__FILE__) . '/../Modules/IO/InputStream.php';
+require_once dirname(__FILE__) . '/../Modules/IO/FileInputStream.php';
 require_once dirname(__FILE__) . '/../ClassLoader.php';
 require_once dirname(__FILE__) . '/../Test/Providers/ClassLoaderProvider.php';
 require_once dirname(__FILE__) . '/../Test/Fixtures/DummyLogger.php';
@@ -114,6 +116,18 @@ class ClassLoaderTest extends \PHPUnit_Framework_TestCase
     }
 
     /**
+     * 正常系
+     * 指定ファイルの名前空間が取得できること
+     * @test
+     * @dataProvider loadNamespaceProvider
+     */
+    public function okLoadNamespaceTest($rootDir, $filePath, $result)
+    {
+        $classLoader = new ClassLoader($rootDir);
+        $this->assertEquals($classLoader->getNamespaces($filePath), $result);
+    }
+
+    /**
      * 異常系
      * loadに失敗した場合、結果が0件になること
      * @test
@@ -151,5 +165,17 @@ class ClassLoaderTest extends \PHPUnit_Framework_TestCase
             return false;
         });
         $this->expectOutputString('');
+    }
+
+    /**
+     * 異常系
+     * 指定ファイルの名前空間が取得できないこと
+     * @test
+     * @dataProvider unLoadNamespaceProvider
+     */
+    public function ngLoadNamespaceTest($rootDir, $filePath, $result)
+    {
+        $classLoader = new ClassLoader($rootDir);
+        $this->assertEquals($classLoader->getNamespaces($filePath), $result);
     }
 }
