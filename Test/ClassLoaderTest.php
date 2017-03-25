@@ -121,10 +121,13 @@ class ClassLoaderTest extends \PHPUnit_Framework_TestCase
      * @test
      * @dataProvider loadNamespaceProvider
      */
-    public function okLoadNamespaceTest($rootDir, $filePath, $result)
+    public function okLoadNamespaceTest($rootDir, $filePath, $list)
     {
         $classLoader = new ClassLoader($rootDir);
-        $this->assertEquals($classLoader->getNamespaces($filePath), $result);
+        $namespaces = $classLoader->getNamespaces($filePath);
+        foreach ($list as $namespace) {
+            $this->assertTrue(in_array($namespace, $namespaces, true));
+        }
     }
 
     /**
