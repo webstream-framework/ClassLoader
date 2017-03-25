@@ -1,9 +1,0 @@
-box:
-  id: webstream/php-alpine
-  cmd: /bin/sh
-build:
-  steps:
-    - script:
-        name: classloader test
-        code: |
-          composer install
