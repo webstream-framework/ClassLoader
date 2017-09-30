@@ -19,7 +19,7 @@ use WebStream\ClassLoader\Test\Fixtures\DummyLogger;
 * @since 2017/01/21
 * @version 0.7
  */
-class ClassLoaderTest extends \PHPUnit_Framework_TestCase
+class ClassLoaderTest extends \PHPUnit\Framework\TestCase
 {
     use ClassLoaderProvider;
 
