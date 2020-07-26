@@ -1,5 +1,5 @@
 # ClassLoader
-[![Build Status](https://travis-ci.org/webstream-framework/ClassLoader.svg?branch=master)](https://travis-ci.org/webstream-framework/ClassLoader)
+![build](https://github.com/webstream-framework/ClassLoader/workflows/build/badge.svg)
 [![Scrutinizer Code Quality](https://scrutinizer-ci.com/g/webstream-framework/ClassLoader/badges/quality-score.png?b=master)](https://scrutinizer-ci.com/g/webstream-framework/ClassLoader/?branch=master)
 [![Code Coverage](https://scrutinizer-ci.com/g/webstream-framework/ClassLoader/badges/coverage.png?b=master)](https://scrutinizer-ci.com/g/webstream-framework/ClassLoader/?branch=master)
 
