@@ -1,0 +1,15 @@
+version: '3'
+services:
+  webstream-framework-classloader:
+    build: ./
+    image: webstream-framework/classloader
+    container_name: webstream-framework-classloader
+    volumes:
+        - ./:/workspace
+    working_dir: /workspace
+    tty: true
+    networks:
+      - webstream_framework
+networks:
+  webstream_framework:
+    external: true
