@@ -1,4 +1,5 @@
 <?php
+
 namespace WebStream\ClassLoader;
 
 use WebStream\DI\Injector;
@@ -31,7 +32,7 @@ class ClassLoader
      */
     public function __construct(string $applicationRoot)
     {
-        $this->logger = new class() { function __call($name, $args) {} };
+        $this->logger = new class () { public function __call($name, $args) {} };
         $this->applicationRoot = $applicationRoot;
     }
 

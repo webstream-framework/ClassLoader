@@ -1,4 +1,5 @@
 <?php
+
 namespace WebStream\ClassLoader\Test\Fixtures;
 
 class ImportFixture1

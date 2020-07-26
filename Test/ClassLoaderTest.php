@@ -1,4 +1,5 @@
 <?php
+
 namespace WebStream\ClassLoader\Test;
 
 require_once dirname(__FILE__) . '/../Modules/DI/Injector.php';
@@ -8,16 +9,14 @@ require_once dirname(__FILE__) . '/../Modules/IO/FileInputStream.php';
 require_once dirname(__FILE__) . '/../ClassLoader.php';
 require_once dirname(__FILE__) . '/../Test/Providers/ClassLoaderProvider.php';
 require_once dirname(__FILE__) . '/../Test/Fixtures/DummyLogger.php';
-
 use WebStream\ClassLoader\ClassLoader;
 use WebStream\ClassLoader\Test\Providers\ClassLoaderProvider;
 use WebStream\ClassLoader\Test\Fixtures\DummyLogger;
-
 /**
-* ClassLoaderTest
-* @author Ryuichi TANAKA.
-* @since 2017/01/21
-* @version 0.7
+ * ClassLoaderTest
+ * @author Ryuichi TANAKA.
+ * @since 2017/01/21
+ * @version 0.7
  */
 class ClassLoaderTest extends \PHPUnit\Framework\TestCase
 {
@@ -110,6 +109,9 @@ class ClassLoaderTest extends \PHPUnit\Framework\TestCase
     {
         $classLoader = new ClassLoader($rootDir);
         $this->assertTrue($classLoader->importAll($dirName, function ($filepath) use ($ignoreClassName) {
+
+
+
             return $filepath === $ignoreClassName;
         }));
         $this->assertTrue(class_exists(\WebStream\ClassLoader\Test\Fixtures\ImportFixture5::class));
@@ -165,6 +167,9 @@ class ClassLoaderTest extends \PHPUnit\Framework\TestCase
         $classLoader = new ClassLoader($rootDir);
         $classLoader->inject('logger', new DummyLogger());
         $classLoader->importAll($dirName, function ($filepath) use ($ignoreClassName) {
+
+
+
             return false;
         });
         $this->expectOutputString('');
