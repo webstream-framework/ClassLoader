@@ -1,4 +1,5 @@
 <?php
+
 namespace Fixtures\Sub;
 
 class Fixture3
