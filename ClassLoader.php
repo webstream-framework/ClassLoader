@@ -2,6 +2,7 @@
 
 namespace WebStream\ClassLoader;
 
+use RecursiveIteratorIterator;
 use WebStream\DI\Injector;
 use WebStream\IO\File;
 use WebStream\IO\FileInputStream;
@@ -24,7 +25,7 @@ class ClassLoader
     /**
      * @var string アプリケーションルートパス
      */
-    private $applicationRoot;
+    private string $applicationRoot;
 
     /**
      * constructor
@@ -49,8 +50,9 @@ class ClassLoader
     /**
      * ファイルをインポートする
      * @param string ファイルパス
-     * @param callable フィルタリング無名関数 trueを返すとインポート
+     * @param callable|null $filter フィルタリング無名関数 trueを返すとインポート
      * @return bool インポート結果
+     * @throws \WebStream\Exception\Extend\IOException
      */
     public function import($filepath, callable $filter = null): bool
     {
@@ -72,8 +74,9 @@ class ClassLoader
     /**
      * 指定ディレクトリのファイルをインポートする
      * @param string ディレクトリパス
-     * @param callable フィルタリング無名関数 trueを返すとインポート
+     * @param callable|null $filter フィルタリング無名関数 trueを返すとインポート
      * @return bool インポート結果
+     * @throws \WebStream\Exception\Extend\IOException
      */
     public function importAll($dirPath, callable $filter = null): bool
     {
@@ -107,6 +110,8 @@ class ClassLoader
      * 名前空間リストを返却する
      * @param string ファイル名
      * @return array<string> 名前空間リスト
+     * @throws \WebStream\Exception\Extend\IOException
+     * @throws \WebStream\Exception\Extend\InvalidArgumentException
      */
     public function getNamespaces($fileName): array
     {
@@ -135,9 +140,10 @@ class ClassLoader
     }
 
     /**
-    * ロード可能なクラスを返却する
-    * @param string クラス名(フルパス指定の場合はクラスパス)
-    * @return array<string> ロード可能クラス
+     * ロード可能なクラスを返却する
+     * @param string クラス名(フルパス指定の場合はクラスパス)
+     * @return array<string> ロード可能クラス
+     * @throws \WebStream\Exception\Extend\IOException
      */
     private function loadClass(string $className): array
     {
@@ -180,18 +186,19 @@ class ClassLoader
      * ロード可能なクラスを複数返却する
      * @param array クラス名
      * @return array<string> ロード済みクラスリスト
+     * @throws \WebStream\Exception\Extend\IOException
      */
     private function loadClassList(array $classList): array
     {
-        $includedlist = [];
+        $includedList = [];
         foreach ($classList as $className) {
             $result = $this->loadClass($className);
             if (is_array($result)) {
-                $includedlist = array_merge($includedlist, $result);
+                $includedList = array_merge($includedList, $result);
             }
         }
 
-        return $includedlist;
+        return $includedList;
     }
 
     /**

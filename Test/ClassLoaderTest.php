@@ -9,16 +9,19 @@ require_once dirname(__FILE__) . '/../Modules/IO/FileInputStream.php';
 require_once dirname(__FILE__) . '/../ClassLoader.php';
 require_once dirname(__FILE__) . '/../Test/Providers/ClassLoaderProvider.php';
 require_once dirname(__FILE__) . '/../Test/Fixtures/DummyLogger.php';
+
+use PHPUnit\Framework\TestCase;
 use WebStream\ClassLoader\ClassLoader;
-use WebStream\ClassLoader\Test\Providers\ClassLoaderProvider;
 use WebStream\ClassLoader\Test\Fixtures\DummyLogger;
+use WebStream\ClassLoader\Test\Providers\ClassLoaderProvider;
+
 /**
  * ClassLoaderTest
  * @author Ryuichi TANAKA.
  * @since 2017/01/21
  * @version 0.7
  */
-class ClassLoaderTest extends \PHPUnit\Framework\TestCase
+class ClassLoaderTest extends TestCase
 {
     use ClassLoaderProvider;
 
@@ -27,6 +30,8 @@ class ClassLoaderTest extends \PHPUnit\Framework\TestCase
      * loadが成功すること
      * @test
      * @dataProvider loadProvider
+     * @param $rootDir
+     * @param $className
      */
     public function okLoadTest($rootDir, $className)
     {
@@ -38,6 +43,8 @@ class ClassLoaderTest extends \PHPUnit\Framework\TestCase
      * 正常系
      * loadが成功すること(リスト読み込み)
      * @dataProvider loadListProvider
+     * @param $rootDir
+     * @param $classList
      */
     public function okLoadListTest($rootDir, $classList)
     {
@@ -50,6 +57,9 @@ class ClassLoaderTest extends \PHPUnit\Framework\TestCase
      * サブディレクトリを指定してloadが成功すること
      * @test
      * @dataProvider loadSubDirProvider
+     * @param $rootDir
+     * @param $className
+     * @param $subDirList
      */
     public function okLoadSubDirTest($rootDir, $className, $subDirList)
     {
@@ -62,6 +72,9 @@ class ClassLoaderTest extends \PHPUnit\Framework\TestCase
      * importで指定ファイルをインポートできること
      * @test
      * @dataProvider importProvider
+     * @param $rootDir
+     * @param $className
+     * @throws \WebStream\Exception\Extend\IOException
      */
     public function okImportTest($rootDir, $className)
     {
@@ -75,6 +88,9 @@ class ClassLoaderTest extends \PHPUnit\Framework\TestCase
      * importAllで指定ディレクトリ配下のファイルをすべてインポートできること
      * @test
      * @dataProvider importAllProvider
+     * @param $rootDir
+     * @param $dirName
+     * @throws \WebStream\Exception\Extend\IOException
      */
     public function okImportAllTest($rootDir, $dirName)
     {
@@ -89,6 +105,10 @@ class ClassLoaderTest extends \PHPUnit\Framework\TestCase
      * フィルタ付きimportで指定ファイルをインポートできること
      * @test
      * @dataProvider filteredImportProvider
+     * @param $rootDir
+     * @param $className
+     * @param $ignoreClassName
+     * @throws \WebStream\Exception\Extend\IOException
      */
     public function okFilteredImportTest($rootDir, $className, $ignoreClassName)
     {
@@ -104,14 +124,15 @@ class ClassLoaderTest extends \PHPUnit\Framework\TestCase
      * フィルタ付きimportAllで指定ファイルをインポートできること
      * @test
      * @dataProvider filteredImportAllProvider
+     * @param $rootDir
+     * @param $dirName
+     * @param $ignoreClassName
+     * @throws \WebStream\Exception\Extend\IOException
      */
     public function okFilteredImportAllTest($rootDir, $dirName, $ignoreClassName)
     {
         $classLoader = new ClassLoader($rootDir);
         $this->assertTrue($classLoader->importAll($dirName, function ($filepath) use ($ignoreClassName) {
-
-
-
             return $filepath === $ignoreClassName;
         }));
         $this->assertTrue(class_exists(\WebStream\ClassLoader\Test\Fixtures\ImportFixture5::class));
@@ -122,6 +143,11 @@ class ClassLoaderTest extends \PHPUnit\Framework\TestCase
      * 指定ファイルの名前空間が取得できること
      * @test
      * @dataProvider loadNamespaceProvider
+     * @param $rootDir
+     * @param $filePath
+     * @param $list
+     * @throws \WebStream\Exception\Extend\IOException
+     * @throws \WebStream\Exception\Extend\InvalidArgumentException
      */
     public function okLoadNamespaceTest($rootDir, $filePath, $list)
     {
@@ -137,6 +163,8 @@ class ClassLoaderTest extends \PHPUnit\Framework\TestCase
      * loadに失敗した場合、結果が0件になること
      * @test
      * @dataProvider unLoadProvider
+     * @param $rootDir
+     * @param $className
      */
     public function ngLoadTest($rootDir, $className)
     {
@@ -149,6 +177,8 @@ class ClassLoaderTest extends \PHPUnit\Framework\TestCase
      * @test
      * 存在しないファイルはインポートできないこと
      * @dataProvider unImportProvider
+     * @param $rootDir
+     * @throws \WebStream\Exception\Extend\IOException
      */
     public function ngImportTest($rootDir)
     {
@@ -161,15 +191,16 @@ class ClassLoaderTest extends \PHPUnit\Framework\TestCase
      * フィルタにマッチしない場合、importAllで指定ファイルをインポートできないこと
      * @test
      * @dataProvider filteredImportAllProvider
+     * @param $rootDir
+     * @param $dirName
+     * @param $ignoreClassName
+     * @throws \WebStream\Exception\Extend\IOException
      */
     public function ngFilteredImportAllTest($rootDir, $dirName, $ignoreClassName)
     {
         $classLoader = new ClassLoader($rootDir);
         $classLoader->inject('logger', new DummyLogger());
         $classLoader->importAll($dirName, function ($filepath) use ($ignoreClassName) {
-
-
-
             return false;
         });
         $this->expectOutputString('');
@@ -180,6 +211,11 @@ class ClassLoaderTest extends \PHPUnit\Framework\TestCase
      * 指定ファイルの名前空間が取得できないこと
      * @test
      * @dataProvider unLoadNamespaceProvider
+     * @param $rootDir
+     * @param $filePath
+     * @param $result
+     * @throws \WebStream\Exception\Extend\IOException
+     * @throws \WebStream\Exception\Extend\InvalidArgumentException
      */
     public function ngLoadNamespaceTest($rootDir, $filePath, $result)
     {
